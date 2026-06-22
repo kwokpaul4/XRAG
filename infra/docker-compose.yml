@@ -1,0 +1,33 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: xrag-postgres
+    environment:
+      POSTGRES_USER: xrag
+      POSTGRES_PASSWORD: xrag
+      POSTGRES_DB: xrag
+    ports:
+      - "5433:5432"
+    volumes:
+      - .postgres-data:/var/lib/postgresql/data
+      - ./infra/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U xrag -d xrag"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: xrag-chroma
+    ports:
+      - "8000:8000"
+    volumes:
+      - .chroma-data:/chroma/chroma
+    environment:
+      ALLOW_RESET: "true"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 5s
+      timeout: 5s
+      retries: 10

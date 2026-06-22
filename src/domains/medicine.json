@@ -1,0 +1,7 @@
+{
+  "name": "medicine",
+  "displayName": "Chinese Medicine",
+  "description": "Traditional Chinese medicine, herbal remedies, acupuncture, and holistic health.",
+  "collections": ["xrag-medicine"],
+  "systemPromptAddendum": "You specialise in Traditional Chinese Medicine (TCM). Draw on concepts such as Qi, Yin-Yang balance, the Five Elements, meridians, acupuncture, and herbal medicine. Always recommend consulting a qualified practitioner for personalised medical advice."
+}

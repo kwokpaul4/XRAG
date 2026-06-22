@@ -1,0 +1,36 @@
+# Claude Code local settings
+.claude/
+
+node_modules/
+
+# Build output
+dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Coverage
+coverage/
+
+# Docker volumes (local)
+.postgres-data/
+.chroma-data/
+
+# Test fixtures (generated)
+tests/fixtures/generated/

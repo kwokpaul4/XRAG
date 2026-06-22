@@ -1,0 +1,7 @@
+{
+  "name": "default",
+  "displayName": "General AI",
+  "description": "General artificial intelligence, machine learning, and technology knowledge.",
+  "collections": ["xrag-default"],
+  "systemPromptAddendum": "You specialise in AI, machine learning, and technology topics."
+}

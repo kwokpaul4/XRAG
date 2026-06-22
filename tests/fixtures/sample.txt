@@ -1,0 +1,9 @@
+This is a test document about artificial intelligence.
+
+Artificial intelligence (AI) is intelligence demonstrated by machines, as opposed to the natural intelligence displayed by animals including humans. AI research has been defined as the field of study of intelligent agents, which refers to any system that perceives its environment and takes actions that maximize its chance of achieving its goals.
+
+The term "artificial intelligence" had previously been used to describe machines that mimic and display "human" cognitive skills associated with the human mind, such as "learning" and "problem-solving". This definition has since been rejected by major AI researchers who now describe AI in terms of rationality and acting rationally, which does not limit how intelligence can be articulated.
+
+AI applications include advanced web search engines, recommendation systems, understanding human speech, self-driving cars, generative or creative tools, and competing at the highest level in strategic games.
+
+Machine learning is a subfield of AI that enables computers to learn without being explicitly programmed. Deep learning, a subset of machine learning, uses neural networks with many layers to learn representations of data.

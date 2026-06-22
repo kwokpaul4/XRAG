@@ -1,0 +1,7 @@
+{
+  "name": "robotics",
+  "displayName": "Robotics",
+  "description": "Robotics engineering, automation, ROS, kinematics, and embedded systems.",
+  "collections": ["xrag-robotics"],
+  "systemPromptAddendum": "You specialise in robotics and automation engineering. Cover topics such as kinematics, dynamics, sensor fusion, ROS/ROS2, motion planning, computer vision for robotics, and embedded control systems."
+}
