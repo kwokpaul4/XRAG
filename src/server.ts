@@ -37,6 +37,11 @@ export function createApp() {
 
 // Only start when run directly
 if (process.argv[1]?.endsWith("server.ts") || process.argv[1]?.endsWith("server.js")) {
+  // Prevent unhandled rejections from crashing the process
+  process.on("unhandledRejection", (reason) => {
+    console.error("Unhandled rejection:", reason);
+  });
+
   const app = createApp();
   app.listen(config.port, () => {
     console.log(`XRAG server running at http://localhost:${config.port}`);
