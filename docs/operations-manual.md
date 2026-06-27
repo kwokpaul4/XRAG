@@ -87,9 +87,10 @@ All configuration is driven by environment variables. Copy `.env.example` to `.e
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `ANTHROPIC_API_KEY` | **Yes** | — | Claude API key |
-| `OPENAI_API_KEY` | No | — | OpenAI key for `text-embedding-3-small`. Leave blank to use Ollama. |
-| `OLLAMA_URL` | No | `http://localhost:11434` | Ollama base URL (used when `OPENAI_API_KEY` is unset) |
+| `ANTHROPIC_API_KEY` | No | — | Claude API key. If set, Claude is used for generation. If blank, Ollama is used. |
+| `OPENAI_API_KEY` | No | — | OpenAI key for `text-embedding-3-small`. Leave blank to use Ollama embeddings. |
+| `OLLAMA_URL` | No | `http://localhost:11434` | Ollama base URL (local or remote). Used for both embeddings and chat when API keys are unset. |
+| `OLLAMA_CHAT_MODEL` | No | `qwen3.5:4b` | Ollama chat model for generation (any model installed in Ollama). |
 | `POSTGRES_URL` | No | `postgresql://xrag:xrag@localhost:5433/xrag` | PostgreSQL connection string |
 | `CHROMA_URL` | No | `http://localhost:8000` | ChromaDB URL |
 | `PORT` | No | `3000` | HTTP server port |
@@ -343,6 +344,24 @@ GitHub Actions runs on every push and pull request to `main`.
 ---
 
 ## 12. Troubleshooting
+
+### Running fully locally with Ollama (no API keys needed)
+
+```bash
+# 1. Install Ollama: https://ollama.com
+# 2. Pull required models
+ollama pull nomic-embed-text   # embeddings (~270MB)
+ollama pull qwen3.5:4b         # chat generation (~2.3GB)
+
+# 3. Start Ollama (bind to all interfaces if running on a remote/VM host)
+OLLAMA_HOST=0.0.0.0 ollama serve
+
+# 4. Set .env
+ANTHROPIC_API_KEY=
+OPENAI_API_KEY=
+OLLAMA_URL=http://<ollama-host>:11434
+OLLAMA_CHAT_MODEL=qwen3.5:4b
+```
 
 ### Server won't start — "password authentication failed"
 

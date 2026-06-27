@@ -12,7 +12,8 @@ The system supports pluggable **knowledge domains** (default: AI; extensible to 
 
 - **Runtime**: Node.js (ESM, TypeScript)
 - **Web framework**: Express (or Fastify — TBD)
-- **LLM**: Claude API via `@anthropic-ai/sdk` (`claude-opus-4-8`, adaptive thinking)
+- **LLM**: Claude (`claude-opus-4-8`, adaptive thinking) when `ANTHROPIC_API_KEY` is set; falls back to Ollama (`qwen3.5:4b` or any chat model) when blank
+- **Embeddings**: `text-embedding-3-small` (OpenAI) when `OPENAI_API_KEY` is set; falls back to `nomic-embed-text` (Ollama)
 - **Vector DB**: ChromaDB (local, Docker) — primary embedding store
 - **Relational DB**: PostgreSQL — structured data, metadata, chat history
 - **Embedding model**: `text-embedding-3-small` (OpenAI) or Ollama local model

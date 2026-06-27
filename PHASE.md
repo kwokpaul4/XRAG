@@ -65,7 +65,7 @@
 
 ---
 
-## Phase 6 — REST API + Web UI
+## Phase 6 — REST API
 **Status**: Complete ✓
 **Goal**: HTTP API consumed by the web frontend.
 **Deliverables**:
@@ -73,8 +73,19 @@
 - [x] `src/api/routes/sources.ts` — file upload + URL ingest + CRUD
 - [x] `src/api/routes/domains.ts` — GET /api/domains
 - [x] `src/server.ts` — Express app entry point
-- [x] `src/web/index.html` — Chat UI with SSE streaming, source mgmt, domain selector
 - [x] API integration tests (70 total tests passing)
+
+---
+
+## Phase 7 — Web UI
+**Status**: Complete ✓
+**Goal**: Minimal chat interface served from Node, usable in browser.
+**Deliverables**:
+- [x] `src/web/index.html` — single-page chat UI
+- [x] SSE-based streaming response display (token-by-token)
+- [x] Source management panel (drag-drop upload, URL ingest, delete)
+- [x] Domain selector (top-right dropdown, auto-populated from /api/domains)
+- [x] User testing completed — end-to-end RAG verified with Ollama (qwen3.5:4b + nomic-embed-text)
 
 ---
 
@@ -83,8 +94,8 @@
 **Goal**: Production-ready reliability.
 **Deliverables**:
 - [ ] Rate limiting and auth middleware
-- [ ] Chunking strategy tuning (size, overlap)
+- [ ] PostgreSQL source adapter (ingest DB table rows as chunks)
 - [ ] Embedding caching (avoid re-embedding unchanged docs)
 - [ ] Structured logging (pino)
-- [ ] Health-check endpoint
+- [ ] Async ingest jobs (large files currently block HTTP response)
 - [ ] Load test
