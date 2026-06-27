@@ -149,7 +149,6 @@ describe("core/generate", () => {
       },
     }];
 
-    // Build a fake async iterable that yields one text delta
     async function* fakeEvents() {
       yield {
         type: "content_block_delta" as const,
@@ -159,16 +158,15 @@ describe("core/generate", () => {
     }
 
     const fakeStream = Object.assign(fakeEvents(), {
-      finalMessage: async () => ({
-        usage: { input_tokens: 100, output_tokens: 50 },
-      }),
+      finalMessage: async () => ({ usage: { input_tokens: 100, output_tokens: 50 } }),
     });
 
-    const mockClient = {
-      messages: {
-        stream: vi.fn().mockReturnValue(fakeStream),
-      },
-    };
+    const mockClient = { messages: { stream: vi.fn().mockReturnValue(fakeStream) } };
+
+    // Force Claude path by temporarily setting the API key in the config
+    const configMod = await import("../../src/config.js");
+    const originalKey = (configMod.config as Record<string, unknown>).anthropicApiKey;
+    (configMod.config as Record<string, unknown>).anthropicApiKey = "test-key";
 
     const result = await generate({
       query: "What is AI?",
@@ -176,6 +174,8 @@ describe("core/generate", () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       _client: mockClient as any,
     });
+
+    (configMod.config as Record<string, unknown>).anthropicApiKey = originalKey;
 
     expect(result.answer).toBe("AI stands for Artificial Intelligence.");
     expect(result.inputTokens).toBeGreaterThanOrEqual(0);

@@ -1,6 +1,7 @@
 import { config } from "../config.js";
 import type { RetrievedChunk, ChatMessage } from "../types.js";
 import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 
 const DEFAULT_SYSTEM = `You are a helpful AI assistant. Answer questions based on the provided context.
 If the context does not contain enough information to answer, say so honestly.
@@ -47,6 +48,33 @@ function buildPrompt(
   return { system, messages };
 }
 
+// ── DeepSeek backend (OpenAI-compatible API) ──────────────────────────────────
+
+async function* deepseekStream(
+  system: string,
+  messages: { role: string; content: string }[]
+): AsyncGenerator<string> {
+  const client = new OpenAI({
+    apiKey: config.deepseekApiKey,
+    baseURL: "https://api.deepseek.com",
+  });
+
+  const stream = await client.chat.completions.create({
+    model: config.deepseekModel,
+    messages: [
+      { role: "system", content: system },
+      ...messages as OpenAI.Chat.ChatCompletionMessageParam[],
+    ],
+    stream: true,
+    max_tokens: 4096,
+  });
+
+  for await (const chunk of stream) {
+    const delta = chunk.choices[0]?.delta?.content;
+    if (delta) yield delta;
+  }
+}
+
 // ── Ollama backend ────────────────────────────────────────────────────────────
 
 async function* ollamaStream(
@@ -91,14 +119,10 @@ async function* ollamaStream(
           hasContent = true;
           yield json.message.content;
         } else if (json.message?.thinking) {
-          // Buffer thinking tokens — yield as fallback if no content tokens arrive
           thinkingBuffer += json.message.thinking;
         }
         if (json.done) {
-          // If model only produced thinking (qwen3.5 reasoning mode), yield that
-          if (!hasContent && thinkingBuffer.trim()) {
-            yield thinkingBuffer;
-          }
+          if (!hasContent && thinkingBuffer.trim()) yield thinkingBuffer;
           return;
         }
       } catch { /* partial line */ }
@@ -134,18 +158,25 @@ async function* claudeStream(
 
 // ── Public API ────────────────────────────────────────────────────────────────
 
+export function activeLLM(): string {
+  if (config.anthropicApiKey) return "Claude";
+  if (config.deepseekApiKey)  return `DeepSeek (${config.deepseekModel})`;
+  return `Ollama (${config.ollamaChatModel})`;
+}
+
 export async function generate(opts: GenerateOptions): Promise<GenerateResult> {
   let answer = "";
-
   for await (const token of generateStream(opts)) {
     answer += token;
     opts.onToken?.(token);
   }
-
   return { answer, inputTokens: 0, outputTokens: 0 };
 }
 
-/** SSE-compatible token stream — uses Claude if ANTHROPIC_API_KEY is set, else Ollama */
+/**
+ * SSE-compatible token stream.
+ * Priority: Claude → DeepSeek → Ollama
+ */
 export async function* generateStream(
   opts: Omit<GenerateOptions, "onToken">
 ): AsyncGenerator<string> {
@@ -154,6 +185,8 @@ export async function* generateStream(
   if (config.anthropicApiKey) {
     const client = opts._client ?? new Anthropic({ apiKey: config.anthropicApiKey });
     yield* claudeStream(system, messages as Anthropic.MessageParam[], client);
+  } else if (config.deepseekApiKey) {
+    yield* deepseekStream(system, messages);
   } else {
     yield* ollamaStream(system, messages);
   }

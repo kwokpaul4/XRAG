@@ -368,6 +368,7 @@
     XRAG
   </div>
   <div class="header-right">
+    <span id="llm-badge" style="font-size:0.72rem;color:var(--text-muted);background:var(--surface2);border:1px solid var(--border-light);padding:3px 9px;border-radius:20px;"></span>
     <span class="domain-label">Domain</span>
     <select id="domain-select"><option value="default">General AI</option></select>
   </div>
@@ -705,6 +706,12 @@
   loadDomains();
   loadSources();
   chatInput.focus();
+
+  // Show active LLM in header
+  fetch('/health').then(r => r.json()).then(d => {
+    const badge = document.getElementById('llm-badge');
+    if (badge && d.llm) badge.textContent = '⚡ ' + d.llm;
+  }).catch(() => {});
 })();
 </script>
 </body>

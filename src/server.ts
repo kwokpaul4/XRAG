@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { chatRouter } from "./api/routes/chat.js";
 import { sourcesRouter } from "./api/routes/sources.js";
 import { domainsRouter } from "./api/routes/domains.js";
+import { activeLLM } from "./core/generate.js";
 import { config } from "./config.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -15,9 +16,9 @@ export function createApp() {
   app.use(cors());
   app.use(express.json());
 
-  // Health check
+  // Health check — includes active LLM backend
   app.get("/health", (_req, res) => {
-    res.json({ status: "ok", version: "0.1.0" });
+    res.json({ status: "ok", version: "0.1.0", llm: activeLLM() });
   });
 
   // API routes
@@ -39,6 +40,6 @@ if (process.argv[1]?.endsWith("server.ts") || process.argv[1]?.endsWith("server.
   const app = createApp();
   app.listen(config.port, () => {
     console.log(`XRAG server running at http://localhost:${config.port}`);
-    console.log(`Domains: http://localhost:${config.port}/api/domains`);
+    console.log(`LLM backend: ${activeLLM()}`);
   });
 }
