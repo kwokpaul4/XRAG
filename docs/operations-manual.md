@@ -363,6 +363,70 @@ OLLAMA_URL=http://<ollama-host>:11434
 OLLAMA_CHAT_MODEL=qwen3.5:4b
 ```
 
+### Running Ollama on a VMware Fusion VM
+
+If Ollama is installed on a Linux VM (e.g. Ubuntu in VMware Fusion) and XRAG runs on the Mac host, follow these steps:
+
+**1. Stop the system Ollama service (it binds to localhost only)**
+
+```bash
+sudo systemctl stop ollama
+sudo systemctl disable ollama
+```
+
+**2. Start Ollama bound to all network interfaces**
+
+```bash
+# Run in background — survives terminal close
+nohup env OLLAMA_HOST=0.0.0.0 ollama serve > ~/ollama.log 2>&1 &
+```
+
+**3. Pull the required models (if not already done)**
+
+```bash
+ollama pull nomic-embed-text   # ~270MB — for embeddings
+ollama pull qwen3.5:4b         # ~2.3GB — for chat generation
+```
+
+**4. Allow port 11434 through the VM firewall**
+
+```bash
+# Ubuntu with ufw
+sudo ufw allow 11434
+
+# CentOS/RHEL with firewalld
+sudo firewall-cmd --add-port=11434/tcp --permanent
+sudo firewall-cmd --reload
+```
+
+**5. Find the VM's IP address**
+
+```bash
+ip addr show | grep "inet " | grep -v 127
+# Example output: inet 192.168.15.131/24 ...
+```
+
+> **Note:** The VM's IP may change on each reboot (DHCP). Set a static IP in VMware Fusion network settings to avoid updating `.env` each time:  
+> VMware Fusion → Preferences → Network → select the vmnet → DHCP → add a static mapping for the VM's MAC address.
+
+**6. Verify from the Mac host**
+
+```bash
+curl http://<vm-ip>:11434/api/tags
+# Should return JSON with your installed models
+```
+
+**7. Update `.env` on the Mac**
+
+```
+ANTHROPIC_API_KEY=
+OPENAI_API_KEY=
+OLLAMA_URL=http://<vm-ip>:11434
+OLLAMA_CHAT_MODEL=qwen3.5:4b
+```
+
+Restart `npm run dev` — XRAG will now use the VM's Ollama for both embeddings and chat.
+
 ### Server won't start — "password authentication failed"
 
 Your local PostgreSQL (port 5432) is conflicting. The Docker container maps to port **5433**. Ensure your `.env` has:
